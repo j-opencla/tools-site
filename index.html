@@ -8,9 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080c10; --bg2: #0d1319; --bg3: #111922; --bg4: #16202e;
-  --border: #1e2d3d; --text: #e8edf2; --text2: #8a9bb0; --text3: #4a5a6e;
-  --accent: #00e5a0; --accent2: #00b8ff; --accent3: #ff6b35; --accent4: #a78bfa;
+  --bg: #C7EDCC; --bg2: #D4F0D4; --bg3: #E8F5E9; --bg4: #B8E0BE;
+  --border: #8CC98C; --text: #1B3A1B; --text2: #3D6B3D; --text3: #6B9B6B;
+  --accent: #2E7D32; --accent2: #00897B; --accent3: #E65100; --accent4: #7B1FA2;
   --radius: 12px; --radius2: 20px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,8 +26,8 @@ body {
 body::after {
   content: ''; position: fixed; inset: 0;
   background-image:
-    linear-gradient(rgba(0,229,160,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,160,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(46,125,50,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46,125,50,0.04) 1px, transparent 1px);
   background-size: 60px 60px; pointer-events: none; z-index: 0;
 }
 
@@ -35,7 +35,7 @@ header {
   position: relative; z-index: 10;
   padding: 56px 40px 44px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(0,229,160,0.05) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(46,125,50,0.05) 0%, transparent 100%);
 }
 .logo-bar {
   display: flex; align-items: center; gap: 10px;
@@ -72,7 +72,7 @@ h1 { font-size: clamp(32px,5vw,58px); font-weight:800; letter-spacing:-2px; line
   border-radius:999px; padding: 11px 18px; max-width:380px;
   transition: border-color .2s, box-shadow .2s;
 }
-.search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,160,0.08); }
+.search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(46,125,50,0.08); }
 .search-box svg { color:var(--text3); flex-shrink:0; }
 .search-input {
   background:none; border:none; outline:none;
@@ -89,8 +89,8 @@ h1 { font-size: clamp(32px,5vw,58px); font-weight:800; letter-spacing:-2px; line
   border-radius:999px; border:1px solid var(--border); background:transparent;
   color:var(--text2); cursor:pointer; transition:all .2s; letter-spacing:.3px;
 }
-.fbtn:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,0.06); }
-.fbtn.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,0.1); box-shadow:0 0 14px rgba(0,229,160,0.12); }
+.fbtn:hover { border-color:var(--accent); color:var(--accent); background:rgba(46,125,50,0.06); }
+.fbtn.active { border-color:var(--accent); color:var(--accent); background:rgba(46,125,50,0.1); box-shadow:0 0 14px rgba(46,125,50,0.12); }
 
 main { position:relative; z-index:10; padding:36px 40px; max-width:1400px; margin:0 auto; }
 
@@ -109,8 +109,8 @@ main { position:relative; z-index:10; padding:36px 40px; max-width:1400px; margi
 .tool-card:nth-child(9){animation-delay:.36s} .tool-card:nth-child(10){animation-delay:.40s}
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 .tool-card:hover{
-  border-color:rgba(0,229,160,.3); transform:translateY(-5px);
-  box-shadow:0 16px 48px rgba(0,229,160,.07),0 4px 16px rgba(0,0,0,.4);
+  border-color:rgba(46,125,50,.3); transform:translateY(-5px);
+  box-shadow:0 16px 48px rgba(46,125,50,.07),0 4px 16px rgba(0,0,0,.4);
 }
 .tool-card.hidden{display:none}
 
@@ -134,10 +134,10 @@ main { position:relative; z-index:10; padding:36px 40px; max-width:1400px; margi
 .open-btn {
   font-family:'Sora',sans-serif; font-size:12px; font-weight:600;
   padding:6px 14px; border-radius:999px;
-  background:rgba(0,229,160,.1); border:1px solid rgba(0,229,160,.3);
+  background:rgba(46,125,50,.1); border:1px solid rgba(46,125,50,.3);
   color:var(--accent); cursor:pointer; transition:all .2s;
 }
-.open-btn:hover { background:var(--accent); color:var(--bg); box-shadow:0 0 16px rgba(0,229,160,.25); }
+.open-btn:hover { background:var(--accent); color:var(--bg); box-shadow:0 0 16px rgba(46,125,50,.25); }
 
 .empty-state { text-align:center; padding:80px 20px; color:var(--text3); font-size:14px; display:none; }
 .empty-state.visible{display:block}
@@ -146,7 +146,7 @@ footer { position:relative; z-index:10; text-align:center; padding:36px; color:v
 
 /* ── TOOL PANEL (expanded inline) ── */
 .tool-panel {
-  background:var(--bg2); border:1px solid rgba(0,229,160,.25);
+  background:var(--bg2); border:1px solid rgba(46,125,50,.25);
   border-radius:var(--radius2); padding:28px; margin-top:14px;
   display:none; animation: panelIn .3s ease;
 }
@@ -167,7 +167,7 @@ footer { position:relative; z-index:10; text-align:center; padding:36px; color:v
 .t-input:focus { border-color:var(--accent); }
 .t-btn {
   padding:10px 20px; border-radius:var(--radius);
-  border:1px solid rgba(0,229,160,.3); background:rgba(0,229,160,.1);
+  border:1px solid rgba(46,125,50,.3); background:rgba(46,125,50,.1);
   color:var(--accent); font-family:'Sora',sans-serif; font-size:13px;
   font-weight:600; cursor:pointer; transition:all .2s; white-space:nowrap;
 }
@@ -224,13 +224,13 @@ textarea.t-area:focus{border-color:var(--accent)}
 /* Json formatter */
 .json-tabs { display:flex; gap:6px; margin-bottom:8px; }
 .json-tab { font-size:12px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s; }
-.json-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,.1); }
+.json-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(46,125,50,.1); }
 .json-error { color:#ff6b6b; font-size:12px; font-family:'JetBrains Mono',monospace; padding:10px; background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); border-radius:8px; }
 
 /* Timer */
 .timer-display { font-family:'JetBrains Mono',monospace; font-size:48px; font-weight:700; text-align:center; color:var(--accent); letter-spacing:4px; padding:20px; }
 .timer-controls { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
-.timer-btn { padding:10px 28px; border-radius:999px; border:1px solid rgba(0,229,160,.3); background:rgba(0,229,160,.1); color:var(--accent); font-family:'Sora',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+.timer-btn { padding:10px 28px; border-radius:999px; border:1px solid rgba(46,125,50,.3); background:rgba(46,125,50,.1); color:var(--accent); font-family:'Sora',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
 .timer-btn:hover { background:var(--accent); color:var(--bg); }
 .timer-btn.stop { border-color:rgba(255,107,53,.4); color:var(--accent3); background:rgba(255,107,53,.1); }
 .timer-btn.stop:hover { background:var(--accent3); color:var(--bg); }
@@ -253,7 +253,7 @@ textarea.t-area:focus{border-color:var(--accent)}
 /* Unit converter */
 .unit-cats { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
 .unit-cat { font-size:12px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s; }
-.unit-cat.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,.1); }
+.unit-cat.active { border-color:var(--accent); color:var(--accent); background:rgba(46,125,50,.1); }
 .unit-row { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; }
 .unit-arrow { color:var(--text3); font-size:16px; }
 
@@ -308,7 +308,7 @@ textarea.t-area:focus{border-color:var(--accent)}
 <footer>TOOLS HUB · 原创工具 · <a href="javascript:showDonate()" style="color:var(--accent);text-decoration:none;">☕ 支持作者</a>
 <!-- 赞赏区域 -->
 <div id="donateOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:var(--bg2);border:1px solid rgba(0,229,160,0.3);border-radius:20px;padding:36px;max-width:380px;text-align:center;position:relative;">
+  <div style="background:var(--bg2);border:1px solid rgba(46,125,50,0.3);border-radius:20px;padding:36px;max-width:380px;text-align:center;position:relative;">
     <button onclick="document.getElementById('donateOverlay').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">✕</button>
     <div style="font-size:24px;font-weight:700;margin-bottom:8px;">☕ 请作者喝杯咖啡</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7;">赞赏任意金额即可解锁全部 Pro 工具<br>感谢你的支持！</div>
@@ -327,7 +327,7 @@ textarea.t-area:focus{border-color:var(--accent)}
 
 <!-- 固定赞赏入口 -->
 <div id="donateFloat" style="position:fixed;bottom:24px;right:24px;z-index:999;cursor:pointer;" onclick="showDonate()">
-  <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(0,229,160,0.3);transition:transform .2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">☕</div>
+  <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(46,125,50,0.3);transition:transform .2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">☕</div>
   <div style="text-align:center;font-size:10px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;">赞赏</div>
 </div>
 </footer>
