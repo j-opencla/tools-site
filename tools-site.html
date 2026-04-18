@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具箱 · ToolsHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c10; --bg2: #0d1319; --bg3: #111922; --bg4: #16202e;
+  --border: #1e2d3d; --text: #e8edf2; --text2: #8a9bb0; --text3: #4a5a6e;
+  --accent: #00e5a0; --accent2: #00b8ff; --accent3: #ff6b35; --accent4: #a78bfa;
+  --radius: 12px; --radius2: 20px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Glowing grid bg */
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,160,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,160,0.04) 1px, transparent 1px);
+  background-size: 60px 60px; pointer-events: none; z-index: 0;
+}
+
+header {
+  position: relative; z-index: 10;
+  padding: 56px 40px 44px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(0,229,160,0.05) 0%, transparent 100%);
+}
+.logo-bar {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+.logo-bar::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); display: inline-block;
+  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+h1 { font-size: clamp(32px,5vw,58px); font-weight:800; letter-spacing:-2px; line-height:1.1; margin-bottom:12px; }
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header-desc { font-size:14px; color:var(--text2); max-width:520px; line-height:1.7; }
+
+.stats { display:flex; gap:28px; margin-top:24px; }
+.stat { display:flex; flex-direction:column; }
+.stat .num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--accent); }
+.stat .lbl { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+.search-wrap {
+  position: relative; z-index: 10; padding: 18px 40px 0;
+}
+.search-box {
+  display:flex; align-items:center; gap:10px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius:999px; padding: 11px 18px; max-width:380px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,160,0.08); }
+.search-box svg { color:var(--text3); flex-shrink:0; }
+.search-input {
+  background:none; border:none; outline:none;
+  font-family:'Sora',sans-serif; font-size:13px; color:var(--text); width:100%;
+}
+.search-input::placeholder { color:var(--text3); }
+
+.nav-filter {
+  position: relative; z-index: 10; padding: 16px 40px;
+  display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--border); background:var(--bg2);
+}
+.fbtn {
+  font-family:'Sora',sans-serif; font-size:13px; padding:6px 16px;
+  border-radius:999px; border:1px solid var(--border); background:transparent;
+  color:var(--text2); cursor:pointer; transition:all .2s; letter-spacing:.3px;
+}
+.fbtn:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,0.06); }
+.fbtn.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,0.1); box-shadow:0 0 14px rgba(0,229,160,0.12); }
+
+main { position:relative; z-index:10; padding:36px 40px; max-width:1400px; margin:0 auto; }
+
+.tools-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; }
+
+.tool-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2);
+  padding:22px; cursor:pointer; transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  opacity:0; transform:translateY(18px);
+  animation: cardIn .45s forwards;
+}
+.tool-card:nth-child(1){animation-delay:.04s} .tool-card:nth-child(2){animation-delay:.08s}
+.tool-card:nth-child(3){animation-delay:.12s} .tool-card:nth-child(4){animation-delay:.16s}
+.tool-card:nth-child(5){animation-delay:.20s} .tool-card:nth-child(6){animation-delay:.24s}
+.tool-card:nth-child(7){animation-delay:.28s} .tool-card:nth-child(8){animation-delay:.32s}
+.tool-card:nth-child(9){animation-delay:.36s} .tool-card:nth-child(10){animation-delay:.40s}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.tool-card:hover{
+  border-color:rgba(0,229,160,.3); transform:translateY(-5px);
+  box-shadow:0 16px 48px rgba(0,229,160,.07),0 4px 16px rgba(0,0,0,.4);
+}
+.tool-card.hidden{display:none}
+
+.tool-icon {
+  width:50px; height:50px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; margin-bottom:14px; position:relative;
+}
+
+.tool-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.tool-cat {
+  font-size:11px; padding:3px 10px; border-radius:999px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+
+.tool-nm { font-size:16px; font-weight:700; margin-bottom:6px; letter-spacing:-.3px; }
+.tool-desc { font-size:12.5px; color:var(--text2); line-height:1.65; margin-bottom:16px; }
+.tool-footer { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); }
+.tool-tags { display:flex; gap:6px; }
+.tool-tag { font-size:10px; padding:2px 8px; border-radius:999px; color:var(--text3); border:1px solid var(--border); font-family:'JetBrains Mono',monospace; }
+.open-btn {
+  font-family:'Sora',sans-serif; font-size:12px; font-weight:600;
+  padding:6px 14px; border-radius:999px;
+  background:rgba(0,229,160,.1); border:1px solid rgba(0,229,160,.3);
+  color:var(--accent); cursor:pointer; transition:all .2s;
+}
+.open-btn:hover { background:var(--accent); color:var(--bg); box-shadow:0 0 16px rgba(0,229,160,.25); }
+
+.empty-state { text-align:center; padding:80px 20px; color:var(--text3); font-size:14px; display:none; }
+.empty-state.visible{display:block}
+
+footer { position:relative; z-index:10; text-align:center; padding:36px; color:var(--text3); font-size:11px; border-top:1px solid var(--border); font-family:'JetBrains Mono',monospace; letter-spacing:1px; }
+
+/* ── TOOL PANEL (expanded inline) ── */
+.tool-panel {
+  background:var(--bg2); border:1px solid rgba(0,229,160,.25);
+  border-radius:var(--radius2); padding:28px; margin-top:14px;
+  display:none; animation: panelIn .3s ease;
+}
+.tool-panel.open{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-title { font-size:20px; font-weight:700; margin-bottom:6px; }
+.panel-sub { font-size:12px; color:var(--text3); margin-bottom:20px; font-family:'JetBrains Mono',monospace; }
+
+/* Tool-specific styles */
+.t-input-group { display:flex; gap:8px; margin-bottom:12px; }
+.t-input {
+  flex:1; padding:10px 14px; border-radius:var(--radius);
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--text); font-family:'Sora',sans-serif; font-size:13px;
+  outline:none; transition:border-color .2s;
+}
+.t-input:focus { border-color:var(--accent); }
+.t-btn {
+  padding:10px 20px; border-radius:var(--radius);
+  border:1px solid rgba(0,229,160,.3); background:rgba(0,229,160,.1);
+  color:var(--accent); font-family:'Sora',sans-serif; font-size:13px;
+  font-weight:600; cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.t-btn:hover { background:var(--accent); color:var(--bg); }
+.t-result {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 16px; min-height:48px;
+  font-family:'JetBrains Mono',monospace; font-size:13px;
+  color:var(--accent); word-break:break-all; display:flex; align-items:center;
+  justify-content:space-between; gap:10px;
+}
+.t-result-label { font-size:11px; color:var(--text3); font-family:'Sora',sans-serif; }
+.copy-btn {
+  padding:4px 10px; border-radius:6px; border:1px solid var(--border);
+  background:var(--bg4); color:var(--text2); font-size:11px; cursor:pointer;
+  transition:all .2s; flex-shrink:0;
+}
+.copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+textarea.t-area {
+  width:100%; padding:14px; border-radius:var(--radius);
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12.5px;
+  outline:none; resize:vertical; min-height:80px; transition:border-color .2s;
+}
+textarea.t-area:focus{border-color:var(--accent)}
+.t-labels { display:flex; gap:8px; margin-bottom:8px; }
+.t-label { font-size:12px; color:var(--text2); }
+.t-output { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); white-space:pre-wrap; min-height:60px; margin-bottom:10px; }
+
+/* slider */
+.t-slider { width:100%; accent-color:var(--accent); margin:8px 0; }
+.t-slider-val { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); }
+
+/* Color swatch */
+.color-preview { width:100%; height:60px; border-radius:var(--radius); margin-bottom:8px; border:1px solid var(--border); }
+.t-col-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.t-col-swatch {
+  display:flex; align-items:center; gap:8px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:8px; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2);
+}
+.swatch-dot { width:16px; height:16px; border-radius:4px; flex-shrink:0; }
+
+/* UUID list */
+.uuid-list { display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; }
+.uuid-item { display:flex; align-items:center; justify-content:space-between; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text2); }
+
+/* BMI gauge */
+.bmi-bar-wrap { position:relative; height:12px; border-radius:6px; overflow:hidden; margin:12px 0 8px; display:flex; }
+.bmi-seg { flex:1; }
+.bmi-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text3); margin-bottom:6px; }
+
+/* Json formatter */
+.json-tabs { display:flex; gap:6px; margin-bottom:8px; }
+.json-tab { font-size:12px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s; }
+.json-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,.1); }
+.json-error { color:#ff6b6b; font-size:12px; font-family:'JetBrains Mono',monospace; padding:10px; background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); border-radius:8px; }
+
+/* Timer */
+.timer-display { font-family:'JetBrains Mono',monospace; font-size:48px; font-weight:700; text-align:center; color:var(--accent); letter-spacing:4px; padding:20px; }
+.timer-controls { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
+.timer-btn { padding:10px 28px; border-radius:999px; border:1px solid rgba(0,229,160,.3); background:rgba(0,229,160,.1); color:var(--accent); font-family:'Sora',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+.timer-btn:hover { background:var(--accent); color:var(--bg); }
+.timer-btn.stop { border-color:rgba(255,107,53,.4); color:var(--accent3); background:rgba(255,107,53,.1); }
+.timer-btn.stop:hover { background:var(--accent3); color:var(--bg); }
+.timer-presets { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.timer-preset { padding:5px 14px; border-radius:999px; border:1px solid var(--border); font-size:12px; color:var(--text2); cursor:pointer; font-family:'JetBrains Mono',monospace; transition:all .2s; }
+.timer-preset:hover { border-color:var(--accent2); color:var(--accent2); }
+
+/* Hash display */
+.hash-result { display:flex; flex-direction:column; gap:6px; }
+.hash-row { display:flex; align-items:center; gap:8px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; }
+.hash-row .hash-label { font-size:11px; color:var(--text3); width:50px; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+.hash-row .hash-val { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); word-break:break-all; }
+
+/* Word/char counter */
+.counter-display { display:flex; gap:12px; flex-wrap:wrap; }
+.counter-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 16px; text-align:center; min-width:70px; }
+.counter-item .ci-num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--accent); }
+.counter-item .ci-lbl { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
+/* Unit converter */
+.unit-cats { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.unit-cat { font-size:12px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s; }
+.unit-cat.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,160,.1); }
+.unit-row { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; }
+.unit-arrow { color:var(--text3); font-size:16px; }
+
+/* Close panel */
+.panel-close { display:flex; justify-content:flex-end; margin-bottom:12px; }
+.panel-close-btn { padding:4px 12px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text3); font-size:12px; cursor:pointer; transition:all .2s; }
+.panel-close-btn:hover { border-color:var(--accent3); color:var(--accent3); }
+
+@media(max-width:640px){
+  header{padding:32px 20px 28px}
+  main{padding:20px}
+  .nav-filter{padding:14px 20px}
+  .search-wrap{padding:14px 20px 0}
+  .stats{gap:16px}
+  .tools-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-bar">TOOLS HUB · 原创工具站</div>
+  <h1>我写的<span class="gradient-text">10个小工具</span><br>免费使用</h1>
+  <p class="header-desc">所有工具均为本人原创开发，纯浏览器端运行，无需联网，无需安装，直接打开即可使用，数据不会上传到任何服务器。</p>
+  <div class="stats">
+    <div class="stat"><div class="num">10</div><div class="lbl">原创工具</div></div>
+    <div class="stat"><div class="num">100%</div><div class="lbl">本地运行</div></div>
+    <div class="stat"><div class="num">隐私安全</div><div class="lbl">数据不上传</div></div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="searchInput" placeholder="搜索工具...">
+  </div>
+</div>
+
+<nav class="nav-filter">
+  <button class="fbtn active" data-f="all">全部</button>
+  <button class="fbtn" data-f="dev">开发</button>
+  <button class="fbtn" data-f="util">效率</button>
+  <button class="fbtn" data-f="media">转换</button>
+  <button class="fbtn" data-f="fun">趣味</button>
+</nav>
+
+<main>
+  <div class="tools-grid" id="toolsGrid"></div>
+  <div class="empty-state" id="emptyState">没有找到匹配的工具</div>
+</main>
+
+<footer>TOOLS HUB · 原创工具 · 持续更新中</footer>
+
+<script>
+// ─────────────────────────────────────────
+//  工具数据
+// ─────────────────────────────────────────
+const tools = [
+  {
+    id: 1, name: "密码生成器", icon: "🔑", iconBg: "linear-gradient(135deg,#00e5a0,#00b894)",
+    cat:"util", catLabel:"效率", catColor:"var(--accent)",
+    desc: "随机生成强密码，支持自定义长度、是否包含特殊字符，可一键复制。纯本地生成，安全无忧。",
+    content: `
+      <div class="t-slider-row" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span class="t-label">密码长度：</span>
+          <input type="range" class="t-slider" id="pwLen" min="6" max="64" value="16">
+          <span class="t-slider-val" id="pwLenVal">16</span>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;">
+            <input type="checkbox" id="pwUpper" checked style="accent-color:var(--accent)"> 大写字母
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;">
+            <input type="checkbox" id="pwLower" checked style="accent-color:var(--accent)"> 小写字母
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;">
+            <input type="checkbox" id="pwNum" checked style="accent-color:var(--accent)"> 数字
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;">
+            <input type="checkbox" id="pwSym" checked style="accent-color:var(--accent)"> 特殊符号
+          </label>
+        </div>
+      </div>
+      <div class="t-result">
+        <span class="t-result-label" id="pwOutput">点击生成</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('pwOutput').textContent)">复制</button>
+      </div>
+      <button class="t-btn" onclick="genPwd()" style="margin-top:10px;width:100%;justify-content:center;">🎲 生成密码</button>
+      <div id="pwStr" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <script>
+        document.getElementById('pwLen').oninput = () => document.getElementById('pwLenVal').textContent = document.getElementById('pwLen').value;
+        function genPwd(){
+          const len=+document.getElementById('pwLen').value;
+          let c='';
+          if(document.getElementById('pwUpper').checked) c+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          if(document.getElementById('pwLower').checked) c+='abcdefghijklmnopqrstuvwxyz';
+          if(document.getElementById('pwNum').checked) c+='0123456789';
+          if(document.getElementById('pwSym').checked) c+='!@#$%^&*()-_=+[]{}|;:,.<>?';
+          if(!c){document.getElementById('pwOutput').textContent='请至少选择一种字符类型';return;}
+          let p=''; for(let i=0;i<len;i++) p+=c[Math.floor(Math.random()*c.length)];
+          document.getElementById('pwOutput').textContent=p;
+          const s=document.getElementById('pwStr');
+          s.innerHTML='';
+          const checks=[{id:'pwUpper',l:'大写'},{id:'pwLower',l:'小写'},{id:'pwNum',l:'数字'},{id:'pwSym',l:'符号'}];
+          checks.forEach(x=>{const el=document.getElementById(x.id);const span=document.createElement('span');span.className='tool-tag';span.textContent=x.l+(el.checked?'✓':'✗');span.style.color=el.checked?'var(--accent)':'var(--text3)';s.appendChild(span);});
+        }
+        genPwd();
+      <\/script>
+    `
+  },
+  {
+    id: 2, name: "二维码生成器", icon: "📱", iconBg: "linear-gradient(135deg,#00b8ff,#0066cc)",
+    cat:"dev", catLabel:"开发", catColor:"var(--accent2)",
+    desc: "输入文字或网址，一键生成高清二维码图片，可自定义尺寸和前背景色。",
+    content: `
+      <div class="t-input-group">
+        <input class="t-input" id="qrInput" placeholder="输入文字或网址...">
+        <button class="t-btn" onclick="genQR()">生成</button>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="t-label">尺寸</span>
+          <input type="range" class="t-slider" id="qrSize" min="128" max="512" step="64" value="256" style="width:120px">
+          <span class="t-slider-val" id="qrSizeVal">256px</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="t-label">前景</span>
+          <input type="color" id="qrFg" value="#00e5a0" style="width:36px;height:32px;border:none;cursor:pointer;border-radius:6px;background:var(--bg3)">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="t-label">背景</span>
+          <input type="color" id="qrBg" value="#0d1319" style="width:36px;height:32px;border:none;cursor:pointer;border-radius:6px;background:var(--bg3)">
+        </div>
+      </div>
+      <div id="qrCanvas" style="display:flex;align-items:center;justify-content:center;min-height:100px;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);padding:16px;">
+        <span style="color:var(--text3);font-size:13px;">输入内容后点击生成</span>
+      </div>
+      <button class="t-btn" id="qrDL" style="margin-top:12px;width:100%;justify-content:center;display:none;" onclick="dlQR()">⬇ 下载二维码</button>
+      <script>
+        let qrDataUrl='';
+        document.getElementById('qrSize').oninput=()=>document.getElementById('qrSizeVal').textContent=document.getElementById('qrSize').value+'px';
+        function genQR(){
+          const v=document.getElementById('qrInput').value.trim();
+          if(!v){document.getElementById('qrCanvas').innerHTML='<span style="color:var(--text3)">请输入内容</span>';return;}
+          const sz=+document.getElementById('qrSize').value;
+          const fg=document.getElementById('qrFg').value;
+          const bg=document.getElementById('qrBg').value;
+          const c=document.createElement('canvas');
+          c.width=c.height=sz;
+          const ctx=c.getContext('2d');
+          ctx.fillStyle=bg; ctx.fillRect(0,0,sz,sz);
+          const qr=document.createElement('div');
+          qr.style.margin='auto';
+          new QRious({value:v,size:sz,background:bg,foreground:fg,level:'M'}).toDataURL();
+          qrDataUrl=new QRious({value:v,size:sz,background:bg,foreground:fg,level:'M'}).toDataURL();
+          const img=document.createElement('img'); img.src=qrDataUrl; img.style.borderRadius='8px'; img.style.maxWidth='100%';
+          document.getElementById('qrCanvas').innerHTML=''; document.getElementById('qrCanvas').appendChild(img);
+          document.getElementById('qrDL').style.display='';
+        }
+        function dlQR(){if(!qrDataUrl)return;const a=document.createElement('a');a.href=qrDataUrl;a.download='qrcode.png';a.click();}
+        // Load QRious lib
+        const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js';document.head.appendChild(s);
+      <\/script>
+    `
+  },
+  {
+    id: 3, name: "Base64 编码/解码", icon: "🔐", iconBg: "linear-gradient(135deg,#a78bfa,#7c3aed)",
+    cat:"dev", catLabel:"开发", catColor:"var(--accent4)",
+    desc: "文本与 Base64 互转，支持中文，处理方式自动适配 URL 安全 Base64 编码。",
+    content: `
+      <div class="json-tabs">
+        <button class="json-tab active" onclick="setB64Mode('encode',this)">编码 → Base64</button>
+        <button class="json-tab" onclick="setB64Mode('decode',this)">解码 ← Base64</button>
+      </div>
+      <textarea class="t-area" id="b64Input" placeholder="输入要处理的文本..."></textarea>
+      <button class="t-btn" onclick="doB64()" style="margin:10px 0;width:100%;justify-content:center;">▶ 执行</button>
+      <div id="b64Error" style="display:none;"></div>
+      <div id="b64OutWrap" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span class="t-label">输出结果</span>
+          <button class="copy-btn" onclick="copyText(document.getElementById('b64Output').textContent)">复制</button>
+        </div>
+        <div class="t-output" id="b64Output" style="min-height:60px;">—</div>
+      </div>
+      <script>
+        let b64Mode='encode';
+        function setB64Mode(m,el){b64Mode=m;document.querySelectorAll('.json-tab').forEach(e=>e.classList.remove('active'));el.classList.add('active');document.getElementById('b64Error').style.display='none';}
+        function doB64(){
+          const i=document.getElementById('b64Input').value;
+          const err=document.getElementById('b64Error');
+          if(!i){document.getElementById('b64Output').textContent='—';return;}
+          try{
+            if(b64Mode==='encode'){
+              document.getElementById('b64Output').textContent=btoa(unescape(encodeURIComponent(i)));
+            }else{
+              document.getElementById('b64Output').textContent=decodeURIComponent(escape(atob(i)));
+            }
+            err.style.display='none';
+          }catch(e){
+            err.style.display='block';
+            err.className='json-error';
+            err.textContent='解码错误：不是有效的 Base64 字符串';
+            document.getElementById('b64Output').textContent='—';
+          }
+        }
+      <\/script>
+    `
+  },
+  {
+    id: 4, name: "JSON 格式化器", icon: "📋", iconBg: "linear-gradient(135deg,#ff6b35,#e52e71)",
+    cat:"dev", catLabel:"开发", catColor:"var(--accent3)",
+    desc: "粘贴 JSON 内容，自动美化/压缩/校验，支持格式化、压缩、清除注释三种模式。",
+    content: `
+      <div class="json-tabs">
+        <button class="json-tab active" onclick="setJsonMode('fmt',this)">格式化</button>
+        <button class="json-tab" onclick="setJsonMode('min',this)">压缩</button>
+        <button class="json-tab" onclick="setJsonMode('val',this)">仅校验</button>
+      </div>
+      <textarea class="t-area" id="jsonInput" placeholder='粘贴 JSON 内容...' style="min-height:90px;"></textarea>
+      <button class="t-btn" onclick="doJson()" style="margin:10px 0;width:100%;justify-content:center;">▶ 处理</button>
+      <div id="jsonErr" style="display:none;"></div>
+      <div id="jsonOutWrap" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span class="t-label">输出</span>
+          <button class="copy-btn" onclick="copyText(document.getElementById('jsonOutput').textContent)">复制</button>
+        </div>
+        <div class="t-output" id="jsonOutput" style="min-height:60px;">—</div>
+      </div>
+      <script>
+        let jsonMode='fmt';
+        function setJsonMode(m,el){jsonMode=m;document.querySelectorAll('.json-tab').forEach(e=>e.classList.remove('active'));el.classList.add('active');}
+        function doJson(){
+          const i=document.getElementById('jsonInput').value.trim();
+          const err=document.getElementById('jsonErr');
+          if(!i){document.getElementById('jsonOutput').textContent='—';return;}
+          try{
+            const parsed=JSON.parse(i);
+            if(jsonMode==='fmt'){
+              document.getElementById('jsonOutput').textContent=JSON.stringify(parsed,null,2);
+            }else if(jsonMode==='min'){
+              document.getElementById('jsonOutput').textContent=JSON.stringify(parsed);
+            }else{
+              document.getElementById('jsonOutput').textContent='✓ 有效的 JSON，共 '+Object.keys(parsed).length+' 个顶层键';
+            }
+            err.style.display='none';
+          }catch(e){
+            err.style.display='block';
+            err.className='json-error';
+            err.textContent='JSON 错误：'+e.message;
+          }
+        }
+      <\/script>
+    `
+  },
+  {
+    id: 5, name: "UUID 生成器", icon: "🆔", iconBg: "linear-gradient(135deg,#00e5a0,#0099cc)",
+    cat:"dev", catLabel:"开发", catColor:"var(--accent)",
+    desc: "批量生成 UUID (v4)，支持一键复制全部或单独复制，支持生成自定义数量。",
+    content: `
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="t-label">数量：</span>
+          <input type="number" class="t-input" id="uuidCount" value="5" min="1" max="100" style="width:80px">
+        </div>
+        <button class="t-btn" onclick="genUuids()">🎲 生成</button>
+        <button class="t-btn" onclick="copyAllUuids()">📋 复制全部</button>
+      </div>
+      <div class="uuid-list" id="uuidList"></div>
+      <script>
+        let currentUuids=[];
+        function genUuids(){
+          const n=Math.min(100,Math.max(1,+document.getElementById('uuidCount').value||5));
+          currentUuids=[];
+          const el=document.getElementById('uuidList');
+          el.innerHTML='';
+          for(let i=0;i<n;i++){
+            const u='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+              const r=Math.random()*16|0;
+              return(c==='x'?r:(r&0x3|0x8)).toString(16);
+            });
+            currentUuids.push(u);
+            const row=document.createElement('div'); row.className='uuid-item';
+            row.innerHTML='<span>'+u+'</span><button class="copy-btn" onclick="copyText(this.parentElement.children[0].textContent)">复制</button>';
+            el.appendChild(row);
+          }
+        }
+        function copyAllUuids(){ copyText(currentUuids.join('\\n')); }
+        genUuids();
+      <\/script>
+    `
+  },
+  {
+    id: 6, name: "番茄钟", icon: "🍅", iconBg: "linear-gradient(135deg,#ff6b35,#e52e71)",
+    cat:"fun", catLabel:"趣味", catColor:"var(--accent3)",
+    desc: "番茄工作法计时器，25分钟专注 / 5分钟休息，可自定义时长，历史记录不保存，专注当下。",
+    content: `
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn" id="timerStart" onclick="timerStart()">▶ 开始</button>
+        <button class="timer-btn stop" onclick="timerReset()">↺ 重置</button>
+      </div>
+      <div class="timer-presets">
+        <button class="timer-preset" onclick="setTimer(25)">25分钟</button>
+        <button class="timer-preset" onclick="setTimer(15)">15分钟</button>
+        <button class="timer-preset" onclick="setTimer(5)">5分钟</button>
+        <button class="timer-preset" onclick="setTimer(45)">45分钟</button>
+        <button class="timer-preset" onclick="setTimer(60)">60分钟</button>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="t-label" style="margin-bottom:6px;">自定义分钟：</div>
+        <div style="display:flex;gap:8px;">
+          <input type="number" class="t-input" id="customMin" placeholder="分钟" min="1" max="180" style="width:100px">
+          <button class="t-btn" onclick="setTimer(+(document.getElementById('customMin').value))">设置</button>
+        </div>
+      </div>
+      <script>
+        let timerSec=25*60, timerInt=null, timerRunning=false;
+        function setTimer(m){timerSec=m*60;timerReset();}
+        function timerReset(){clearInterval(timerInt);timerRunning=false;updateDisplay();document.getElementById('timerStart').textContent='▶ 开始';document.getElementById('timerStart').onclick=timerStart;}
+        function updateDisplay(){const m=Math.floor(timerSec/60),s=timerSec%60;document.getElementById('timerDisplay').textContent=m+':'+String(s).padStart(2,'0');}
+        function timerStart(){
+          if(timerRunning){clearInterval(timerInt);timerRunning=false;document.getElementById('timerStart').textContent='▶ 继续';return;}
+          timerRunning=true;document.getElementById('timerStart').textContent='⏸ 暂停';document.getElementById('timerStart').onclick=timerPause;
+          timerInt=setInterval(()=>{timerSec--;updateDisplay();if(timerSec<=0){clearInterval(timerInt);timerRunning=false;document.getElementById('timerDisplay').textContent='完成！';document.getElementById('timerDisplay').style.color='var(--accent3)';setTimeout(()=>{document.getElementById('timerDisplay').style.color='var(--accent)';timerReset();},3000);}},1000);
+        }
+        function timerPause(){clearInterval(timerInt);timerRunning=false;document.getElementById('timerStart').textContent='▶ 继续';document.getElementById('timerStart').onclick=timerStart;}
+      <\/script>
+    `
+  },
+  {
+    id: 7, name: "哈希计算器", icon: "🔏", iconBg: "linear-gradient(135deg,#a78bfa,#6366f1)",
+    cat:"dev", catLabel:"开发", catColor:"var(--accent4)",
+    desc: "计算文本的 MD5 / SHA-1 / SHA-256 / SHA-512 哈希值，纯前端计算，不会发送到任何服务器。",
+    content: `
+      <textarea class="t-area" id="hashInput" placeholder="输入文本内容..." style="min-height:80px;margin-bottom:12px;"></textarea>
+      <div class="hash-result" id="hashResult" style="margin-bottom:10px;">
+        <div class="hash-row"><span class="hash-label">MD5</span><span class="hash-val" id="hashMD5">—</span></div>
+        <div class="hash-row"><span class="hash-label">SHA-1</span><span class="hash-val" id="hashSHA1">—</span></div>
+        <div class="hash-row"><span class="hash-label">SHA-256</span><span class="hash-val" id="hashSHA256">—</span></div>
+        <div class="hash-row"><span class="hash-label">SHA-512</span><span class="hash-val" id="hashSHA512">—</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="t-btn" onclick="computeHash()" style="flex:1;justify-content:center;">🧮 计算哈希</button>
+        <button class="copy-btn" style="padding:10px 14px;" onclick="copyHashes()">复制全部</button>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"><\/script>
+      <script>
+        function computeHash(){
+          const v=document.getElementById('hashInput').value;
+          if(!v){['hashMD5','hashSHA1','hashSHA256','hashSHA512'].forEach(id=>document.getElementById(id).textContent='—');return;}
+          document.getElementById('hashMD5').textContent=CryptoJS.MD5(v).toString();
+          document.getElementById('hashSHA1').textContent=CryptoJS.SHA1(v).toString();
+          document.getElementById('hashSHA256').textContent=CryptoJS.SHA256(v).toString();
+          document.getElementById('hashSHA512').textContent=CryptoJS.SHA512(v).toString();
+        }
+        function copyHashes(){
+          const t=['MD5','SHA-1','SHA-256','SHA-512'].map((k,i)=>k+': '+document.getElementById(['hashMD5','hashSHA1','hashSHA256','hashSHA512'][i]).textContent).join('\\n');
+          copyText(t);
+        }
+      <\/script>
+    `
+  },
+  {
+    id: 8, name: "单位换算器", icon: "⚖️", iconBg: "linear-gradient(135deg,#00b8ff,#0099cc)",
+    cat:"media", catLabel:"转换", catColor:"var(--accent2)",
+    desc: "支持长度、重量、温度、面积、体积、速度 6 大类单位的双向实时换算。",
+    content: `
+      <div class="unit-cats" style="margin-bottom:12px;">
+        <button class="unit-cat active" onclick="setUnitCat('len',this)">长度</button>
+        <button class="unit-cat" onclick="setUnitCat('weight',this)">重量</button>
+        <button class="unit-cat" onclick="setUnitCat('temp',this)">温度</button>
+        <button class="unit-cat" onclick="setUnitCat('area',this)">面积</button>
+        <button class="unit-cat" onclick="setUnitCat('vol',this)">体积</button>
+        <button class="unit-cat" onclick="setUnitCat('speed',this)">速度</button>
+      </div>
+      <div class="unit-row" id="unitRow" style="margin-bottom:12px;">
+        <select class="t-input" id="unitFrom" onchange="convertUnit()"></select>
+        <span class="unit-arrow">⇄</span>
+        <select class="t-input" id="unitTo" onchange="convertUnit()"></select>
+      </div>
+      <div class="t-input-group" style="margin-bottom:0;">
+        <input type="number" class="t-input" id="unitInput" placeholder="输入数值..." oninput="convertUnit()">
+        <span class="t-label" id="unitFromLbl" style="align-self:center;">—</span>
+      </div>
+      <div class="t-result" style="margin-top:10px;">
+        <span class="t-result-label" id="unitOutput">—</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('unitOutput').textContent)">复制</button>
+      </div>
+      <script>
+        const unitDefs={
+          len:{units:['米(m)','千米(km)','厘米(cm)','毫米(mm)','英里(mi)','英尺(ft)','英寸(in)','码(yd)'],factors:[1,1000,0.01,0.001,1609.344,0.3048,0.0254,0.9144]},
+          weight:{units:['千克(kg)','克(g)','毫克(mg)','吨(t)','磅(lb)','盎司(oz)'],factors:[1,0.001,0.000001,1000,0.453592,0.0283495]},
+          temp:{units:['摄氏度(°C)','华氏度(°F)','开尔文(K)'],factors:[1,1,1],offsets:[0,32,273.15]},
+          area:{units:['平方米(m²)','平方千米(km²)','公顷(ha)','英亩(acre)','平方英尺(sq ft)'],factors:[1,1000000,10000,4046.86,0.092903]},
+          vol:{units:['升(L)','毫升(mL)','立方米(m³)','加仑(gal)','夸脱(qt)'],factors:[1,0.001,1000,3.78541,0.946353]},
+          speed:{units:['m/s','km/h','mph','knot','ft/s'],factors:[1,0.277778,0.44704,0.514444,0.3048]}
+        };
+        let currentUnitCat='len';
+        function setUnitCat(cat,el){currentUnitCat=cat;document.querySelectorAll('.unit-cat').forEach(e=>e.classList.remove('active'));el.classList.add('active');buildUnitSelects();}
+        function buildUnitSelects(){
+          const def=unitDefs[currentUnitCat],fEl=document.getElementById('unitFrom'),tEl=document.getElementById('unitTo');
+          fEl.innerHTML=def.units.map((u,i)=>'<option value="'+i+'">'+u+'</option>').join('');
+          tEl.innerHTML=def.units.map((u,i)=>'<option value="'+i+'">'+u+'</option>').join('');
+          if(def.units.length>1){tEl.value='1';}
+          document.getElementById('unitFromLbl').textContent=def.units[0].split('(')[0];
+        }
+        function convertUnit(){
+          const v=+document.getElementById('unitInput').value;
+          const fi=+document.getElementById('unitFrom').value;
+          const ti=+document.getElementById('unitTo').value;
+          const def=unitDefs[currentUnitCat];
+          document.getElementById('unitFromLbl').textContent=def.units[fi].split('(')[0];
+          if(isNaN(v)||v===''){document.getElementById('unitOutput').textContent='—';return;}
+          let result;
+          if(currentUnitCat==='temp'){
+            const celsius=fi===0?v:fi===1?v-32:v-273.15;
+            result=ti===0?celsius:ti===1?celsius*9/5+32:celsius+273.15;
+          }else{
+            const base=v*def.factors[fi];
+            result=base/def.factors[ti];
+          }
+          document.getElementById('unitOutput').textContent=parseFloat(result.toPrecision(10))+' '+def.units[ti].match(/\(([^)]+)\)/)?.[1]||'';
+        }
+        buildUnitSelects();
+      <\/script>
+    `
+  },
+  {
+    id: 9, name: "字符/字数统计", icon: "📊", iconBg: "linear-gradient(135deg,#00e5a0,#00b894)",
+    cat:"util", catLabel:"效率", catColor:"var(--accent)",
+    desc: "实时统计字符数、单词数、中文数、句子数、段落数、去除空格后的字符数。",
+    content: `
+      <textarea class="t-area" id="wcInput" placeholder="在这里输入或粘贴文本..." style="min-height:120px;margin-bottom:12px;" oninput="countWords()"></textarea>
+      <div class="counter-display" id="wcDisplay">
+        <div class="counter-item"><div class="ci-num" id="wcChars">0</div><div class="ci-lbl">字符</div></div>
+        <div class="counter-item"><div class="ci-num" id="wcNoSpace">0</div><div class="ci-lbl">去空格</div></div>
+        <div class="counter-item"><div class="ci-num" id="wcChinese">0</div><div class="ci-lbl">中文</div></div>
+        <div class="counter-item"><div class="ci-num" id="wcWords">0</div><div class="ci-lbl">单词</div></div>
+        <div class="counter-item"><div class="ci-num" id="wcSents">0</div><div class="ci-lbl">句子</div></div>
+        <div class="counter-item"><div class="ci-num" id="wcPara">0</div><div class="ci-lbl">段落</div></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="t-btn" onclick="copyWc()">📋 复制统计</button>
+        <button class="t-btn" onclick="document.getElementById('wcInput').value='';countWords();">🗑️ 清空</button>
+      </div>
+      <script>
+        function countWords(){
+          const t=document.getElementById('wcInput').value;
+          document.getElementById('wcChars').textContent=t.length;
+          document.getElementById('wcNoSpace').textContent=t.replace(/\\s/g,'').length;
+          const chinese=(t.match(/[\\u4e00-\\u9fa5]/g)||[]).length;
+          document.getElementById('wcChinese').textContent=chinese;
+          const words=(t.match(/[a-zA-Z]+/g)||[]).length;
+          document.getElementById('wcWords').textContent=words;
+          const sents=(t.match(/[.!?。！？]+/g)||[]).length||(t.trim()?1:0);
+          document.getElementById('wcSents').textContent=sents;
+          const paras=t.split(/\\n\\n+/).filter(p=>p.trim()).length||(t.trim()?1:0);
+          document.getElementById('wcPara').textContent=paras;
+        }
+        function copyWc(){
+          const d=document.getElementById;
+          copyText('字符:'+d('wcChars').textContent+' | 去空格:'+d('wcNoSpace').textContent+' | 中文:'+d('wcChinese').textContent+' | 单词:'+d('wcWords').textContent+' | 句子:'+d('wcSents').textContent+' | 段落:'+d('wcPara').textContent);
+        }
+      <\/script>
+    `
+  },
+  {
+    id: 10, name: "颜色选择器", icon: "🎨", iconBg: "linear-gradient(135deg,#ff6b35,#ff9500)",
+    cat:"fun", catLabel:"趣味", catColor:"var(--accent3)",
+    desc: "拾取颜色，实时显示 HEX / RGB / HSL / HSV / CMYK 五种格式，支持色板收藏。",
+    content: `
+      <div class="color-preview" id="colorPreview" style="background:#00e5a0;"></div>
+      <div class="t-input-group" style="margin-bottom:12px;">
+        <input type="color" id="colorPicker" value="#00e5a0" style="width:48px;height:42px;border:none;cursor:pointer;border-radius:8px;background:var(--bg3)">
+        <input type="text" class="t-input" id="colorHex" value="#00e5a0" placeholder="#RRGGBB" oninput="hexToColor(this.value)">
+      </div>
+      <div class="t-col-grid" id="colorFormats">
+        <div class="t-col-swatch"><span class="swatch-dot" id="swatchHex" style="background:#00e5a0"></span><span id="fmtHex">#00E5A0</span></div>
+        <div class="t-col-swatch"><span class="swatch-dot" id="swatchRGB" style="background:#00e5a0"></span><span id="fmtRGB">RGB(0,229,160)</span></div>
+        <div class="t-col-swatch"><span class="swatch-dot" id="swatchHSL" style="background:#00e5a0"></span><span id="fmtHSL">HSL(159,100%,45%)</span></div>
+        <div class="t-col-swatch"><span class="swatch-dot" id="swatchHSV" style="background:#00e5a0"></span><span id="fmtHSV">HSV(159°,100%,90%)</span></div>
+        <div class="t-col-swatch" style="grid-column:span 2"><span class="swatch-dot" id="swatchCMYK" style="background:#00e5a0"></span><span id="fmtCMYK">CMYK(100%,0%,30%,10%)</span></div>
+      </div>
+      <button class="copy-btn" style="margin-top:10px;" onclick="copyText(document.getElementById('fmtHex').textContent)">📋 复制 HEX</button>
+      <script>
+        function hexToColor(hex){
+          hex=hex.trim();
+          if(!/^#?[0-9a-fA-F]{6}$/.test(hex))return;
+          if(hex[0]!=='#')hex='#'+hex;
+          document.getElementById('colorPicker').value=hex;
+          updateColor(hex);
+        }
+        document.getElementById('colorPicker').oninput=function(){const v=this.value;document.getElementById('colorHex').value=v;updateColor(v);}
+        function updateColor(hex){
+          document.getElementById('colorPreview').style.background=hex;
+          const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+          const hsl=rgbToHsl(r,g,b);
+          const hsv=rgbToHsv(r,g,b);
+          const cmyk=rgbToCmyk(r,g,b);
+          document.getElementById('fmtHex').textContent=hex.toUpperCase();
+          document.getElementById('fmtRGB').textContent='RGB('+r+','+g+','+b+')';
+          document.getElementById('fmtHSL').textContent='HSL('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
+          document.getElementById('fmtHSV').textContent='HSV('+hsv.h+'°,'+hsv.s+'%,'+hsv.v+'%)';
+          document.getElementById('fmtCMYK').textContent='CMYK('+cmyk.c+'%,'+cmyk.m+'%,'+cmyk.y+'%,'+cmyk.k+'%)';
+          ['Hex','RGB','HSL','HSV','CMYK'].forEach(f=>document.getElementById('swatch'+f).style.background=hex);
+        }
+        function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0;}else{const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;default:h=((r-g)/d+4)/6;break;}}return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};}
+        function rgbToHsv(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h,s,v=max;s=max===0?0:d/max;if(max===min){h=0;}else{switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;default:h=((r-g)/d+4)/6;break;}}return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(v*100)};}
+        function rgbToCmyk(r,g,b){if(r===0&&g===0&&b===0)return{h:'—',s:'—',l:'—'};const c=1-r/255,m=1-g/255,y=1-b/255,k=Math.min(c,m,y);return{c:Math.round((c-k)/(1-k)*100),m:Math.round((m-k)/(1-k)*100),y:Math.round((y-k)/(1-k)*100),k:Math.round(k*100)};}
+      <\/script>
+    `
+  }
+];
+
+// ─────────────────────────────────────────
+//  渲染
+// ─────────────────────────────────────────
+function renderTools(filter='all', query=''){
+  const grid=document.getElementById('toolsGrid');
+  const empty=document.getElementById('emptyState');
+  const filtered=tools.filter(t=>{
+    const mf=filter==='all'||t.cat===filter;
+    const mq=query===''||t.name.includes(query)||t.desc.includes(query);
+    return mf&&mq;
+  });
+  grid.innerHTML='';
+  empty.classList.toggle('visible',filtered.length===0);
+  filtered.forEach(tool=>{
+    const card=document.createElement('div');
+    card.className='tool-card';
+    card.dataset.id=tool.id;
+    card.innerHTML=`
+      <div class="tool-top">
+        <div class="tool-icon" style="background:${tool.iconBg}">${tool.icon}</div>
+        <span class="tool-cat" style="background:${tool.catColor}20;color:${tool.catColor};border:1px solid ${tool.catColor}40">${tool.catLabel}</span>
+      </div>
+      <div class="tool-nm">${tool.name}</div>
+      <div class="tool-desc">${tool.desc}</div>
+      <div class="tool-footer">
+        <div class="tool-tags"><span class="tool-tag">原创</span><span class="tool-tag">本地</span></div>
+        <button class="open-btn" onclick="event.stopPropagation();togglePanel(${tool.id})">打开 →</button>
+      </div>
+      <div class="tool-panel" id="panel-${tool.id}">
+        <div class="panel-close"><button class="panel-close-btn" onclick="closePanel(${tool.id})">收起 ↑</button></div>
+        ${tool.content}
+      </div>
+    `;
+    card.addEventListener('click',()=>togglePanel(tool.id));
+    grid.appendChild(card);
+  });
+}
+
+function togglePanel(id){
+  const panel=document.getElementById('panel-'+id);
+  const isOpen=panel.classList.contains('open');
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('open'));
+  if(!isOpen)panel.classList.add('open');
+}
+function closePanel(id){document.getElementById('panel-'+id).classList.remove('open');}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const el=document.activeElement;
+    const orig=el.textContent||el.value;
+    el.textContent='已复制 ✓';
+    setTimeout(()=>{if(el.textContent==='已复制 ✓')el.textContent=orig;},1500);
+  });
+}
+
+// Filter
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTools(btn.dataset.f, document.getElementById('searchInput').value);
+  });
+});
+document.getElementById('searchInput').addEventListener('input',e=>{
+  renderTools(document.querySelector('.fbtn.active').dataset.f, e.target.value);
+});
+
+renderTools();
+</script>
+</body>
+</html>
